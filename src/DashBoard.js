@@ -44,7 +44,7 @@ const AccountInfo = ({ account }) => {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const erc20 = new ethers.Contract(address, erc20abi, provider);
       const tokenBalance = await erc20.balanceOf(account);
-      setTokenBalance(tokenBalance);
+      setTokenBalance(ethers.utils.formatEther(tokenBalance));
     } catch (err) {
       openNotificationWithIcon("error", err.message);
     }
@@ -57,7 +57,10 @@ const AccountInfo = ({ account }) => {
       const signer = await provider.getSigner();
       const erc20 = new ethers.Contract(contractAddress, erc20abi, signer);
       await erc20
-        .transfer(values.recipientAddress, Number(values.amount))
+        .transfer(
+          values.recipientAddress,
+          ethers.utils.parseEther(values.amount)
+        )
         .then((res) => setTransferLoading(true));
     } catch (err) {
       openNotificationWithIcon("error", err.message);
@@ -70,7 +73,7 @@ const AccountInfo = ({ account }) => {
       const erc20 = new ethers.Contract(contractAddress, erc20abi, provider);
       erc20.on("Transfer", async (from, to, amount, event) => {
         const tokenBalance = await erc20.balanceOf(account);
-        setTokenBalance(tokenBalance);
+        setTokenBalance(ethers.utils.formatEther(tokenBalance));
         setTransferLoading(false);
       });
     }
